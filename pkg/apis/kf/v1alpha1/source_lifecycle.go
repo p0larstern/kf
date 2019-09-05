@@ -38,6 +38,7 @@ const (
 	BuildArgImage            = "IMAGE"
 	BuildArgBuildpack        = "BUILDPACK"
 	BuildArgBuildpackBuilder = "BUILDER_IMAGE"
+	BuildArgDockerfile       = "DOCKERFILE"
 )
 
 func (status *SourceStatus) manage() apis.ConditionManager {

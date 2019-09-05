@@ -34,6 +34,7 @@ type Application struct {
 	Path       string            `yaml:"path,omitempty"`
 	Buildpacks []string          `yaml:"buildpacks,omitempty"`
 	Docker     AppDockerImage    `yaml:"docker,omitempty"`
+	Dockerfile Dockerfile        `yaml:"dockerfile,omitempty"`
 	Env        map[string]string `yaml:"env,omitempty"`
 	Services   []string          `yaml:"services,omitempty"`
 	DiskQuota  string            `yaml:"disk_quota,omitempty"`
@@ -76,6 +77,11 @@ type Route struct {
 // Manifest is an application's configuration.
 type Manifest struct {
 	Applications []Application `yaml:"applications"`
+}
+
+// Dockerfile contains the path to a Dockerfile to build.
+type Dockerfile struct {
+	Path string `yaml:"path,omitempty"`
 }
 
 // NewFromFile creates a Manifest from a manifest file.

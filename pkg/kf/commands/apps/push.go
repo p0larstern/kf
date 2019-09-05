@@ -327,6 +327,7 @@ func NewPushCommand(
 					pushOpts = append(pushOpts,
 						apps.WithPushSourceImage(imageName),
 						apps.WithPushBuildpack(app.Buildpack()),
+						apps.WithPushDockerfilePath(app.Dockerfile.Path),
 					)
 				} else {
 					if containerRegistry != "" {
