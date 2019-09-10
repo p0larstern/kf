@@ -76,6 +76,7 @@ func NewPushCommand(
 		containerRegistry  string
 		sourceImage        string
 		containerImage     string
+		dockerfilePath     string
 		manifestFile       string
 		instances          int
 		minScale           int
@@ -160,6 +161,8 @@ func NewPushCommand(
 			overrides := &manifest.Application{}
 			{
 				overrides.Docker.Image = containerImage
+
+				overrides.Dockerfile.Path = dockerfilePath
 
 				// Read environment variables from cli args
 				envVars, err := envutil.ParseCLIEnvVars(envs)
@@ -298,7 +301,7 @@ func NewPushCommand(
 				}
 
 				if app.Docker.Image == "" {
-					// buildpack app
+					// buildpack or Dockerfile app
 					registry := containerRegistry
 					switch {
 					case registry != "":
@@ -320,6 +323,16 @@ func NewPushCommand(
 						if err != nil {
 							return err
 						}
+
+						// Sanity check that the Dockerfile is in the source
+						if app.Dockerfile.Path != "" {
+							absDockerPath := filepath.Join(srcPath, filepath.FromSlash(app.Dockerfile.Path))
+							if _, err := os.Stat(absDockerPath); os.IsNotExist(err) {
+								fmt.Fprintln(cmd.OutOrStdout(), "app root:", srcPath)
+								return fmt.Errorf("the Dockerfile %s couldn't be found under the app root", app.Dockerfile.Path)
+							}
+						}
+
 						if err := b.BuildSrcImage(srcPath, imageName); err != nil {
 							return err
 						}
@@ -427,6 +440,13 @@ func NewPushCommand(
 		"docker-image",
 		"",
 		"Docker image to deploy.",
+	)
+
+	pushCmd.Flags().StringVar(
+		&dockerfilePath,
+		"dockerfile",
+		"",
+		"Path to the Dockerfile to build. Relative to the source root.",
 	)
 
 	pushCmd.Flags().StringVarP(
